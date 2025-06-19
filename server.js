@@ -7,19 +7,14 @@ dotenv.config({
 
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.PASSWORD);
 
-mongoose
-  .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then(() => {
-    console.log('DB connection successful');
-  });
+mongoose.connect(DB).then(() => {
+  console.log('DB connection successful');
+});
 
 const app = require('./app');
 
 const port = process.env.PORT || 3000;
+
 app.listen(port, () => {
   console.log(`server is running on port ${port}`);
 });
