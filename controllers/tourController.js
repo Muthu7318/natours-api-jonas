@@ -1,5 +1,6 @@
 // const fs = require('fs');
 const qs = require('qs');
+
 const Tour = require('./../models/tourModel');
 
 // const tours = JSON.parse(
@@ -19,8 +20,22 @@ const Tour = require('./../models/tourModel');
 //   next();
 // };
 
+exports.aliasTopTours = (req, res, next) => {
+  console.log('🔥 aliasTopTours called');
+  // req.query.limit = '5';
+  // req.query.sort = '-ratingsAverage,price';
+  // req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+
+  req.url =
+    '/?limit=5&sort=-ratingsAverage,price&fields=name,price,ratingsAverage,summary,difficulty';
+
+  console.log('📦 Overwritten req.url:', req.url);
+  next();
+};
+
 exports.getAllTours = async (req, res) => {
   try {
+    console.log('🎯 getAllTours req.query:', req.query);
     //building query
     //1) filtering
     const parsedQuery = qs.parse(req._parsedUrl.query);
