@@ -57,6 +57,23 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v');
     }
 
+    //pagination
+    //page=2&limit=10; page 2 with 10 results; page 1, 11- 20, 21-30;
+
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+
+      if (skip >= numTours) {
+        throw new Error('this page does not exist');
+      }
+    }
+
     //{ difficulty:"easy", duration:{ $gte : 5}}
 
     // const query = Tour.find()
@@ -80,7 +97,7 @@ exports.getAllTours = async (req, res) => {
     console.log(err);
     res.status(404).json({
       status: 'failure',
-      message: err,
+      message: err.message,
     });
   }
 };
