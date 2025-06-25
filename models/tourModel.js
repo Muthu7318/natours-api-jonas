@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -53,6 +54,9 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    slug: {
+      type: String,
+    },
   },
   {
     toJSON: {
@@ -67,6 +71,24 @@ const tourSchema = new mongoose.Schema(
 tourSchema.virtual('durationWeeks').get(function () {
   return Math.ceil(this.duration / 7);
 });
+
+// document middleware : runs before the "save" command and "create" command but not on "insertMany"
+
+// tourSchema.pre('save', function (next) {
+//   this.slug = slugify(this.name, {
+//     lower: true,
+//   });
+
+//   next();
+// });
+
+// // document middlware: post will have access to the saved doc and middleware fn
+
+// tourSchema.post('save', function (doc, next) {
+//   console.log(doc);
+//   console.log('doc is saved');
+//   next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
