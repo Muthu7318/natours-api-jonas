@@ -57,6 +57,10 @@ const tourSchema = new mongoose.Schema(
     slug: {
       type: String,
     },
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: {
@@ -74,19 +78,45 @@ tourSchema.virtual('durationWeeks').get(function () {
 
 // document middleware : runs before the "save" command and "create" command but not on "insertMany"
 
-// tourSchema.pre('save', function (next) {
-//   this.slug = slugify(this.name, {
-//     lower: true,
-//   });
+tourSchema.pre('save', function (next) {
+  this.slug = slugify(this.name, {
+    lower: true,
+  });
 
-//   next();
-// });
+  next();
+});
 
 // // document middlware: post will have access to the saved doc and middleware fn
 
 // tourSchema.post('save', function (doc, next) {
 //   console.log(doc);
 //   console.log('doc is saved');
+//   next();
+// });
+
+// query middleware
+tourSchema.pre(/^find/, function (next) {
+  this.find({
+    secretTour: {
+      $ne: true,
+    },
+  });
+
+  this.startTime = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log('time is ', Date.now() - this.startTime);
+  next();
+});
+
+// tourSchema.pre('findOne', function (next) {
+//   this.find({
+//     secretTour: {
+//       $ne: true,
+//     },
+//   });
 //   next();
 // });
 
