@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -10,6 +11,14 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [40, 'A Tour name must have less than 40 characters'],
       minlength: [10, 'A Tour name must have more than 10 characters'],
+      validate: {
+        message: 'Tour name must only contain letters (a-z).',
+        validator: function (val) {
+          return typeof val === 'string'
+            ? validator.isAlpha(val.replace(/\s/g, ''))
+            : true;
+        },
+      },
     },
     ratingsAverage: {
       type: Number,
@@ -24,6 +33,16 @@ const tourSchema = new mongoose.Schema(
     price: {
       type: Number,
       required: [true, 'tour must have a price'],
+    },
+    priceDiscount: {
+      type: Number,
+      validate: {
+        message: 'Discount price ({VALUE}) should be regular price', // VALUE -> should be in capital only
+        validator: function (value) {
+          // this runs only for create a new document
+          return value < this.price;
+        },
+      },
     },
     duration: {
       type: Number,
@@ -41,7 +60,6 @@ const tourSchema = new mongoose.Schema(
         message: 'Difficult is either : easy, medium, difficult',
       },
     },
-    priceDiscount: Number,
     summary: {
       type: String,
       trim: true,
